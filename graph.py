@@ -1,9 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pylab
 size = 25
-
+n = 0
 
 def plot(formula, x_range, x_coors, y_coors, title):
+    global n
     assert "x" in formula
     #assert all x values git on graph
     assert all([0 < x <= 100 for x in x_range])
@@ -20,7 +22,9 @@ def plot(formula, x_range, x_coors, y_coors, title):
     f[1] = round(float(f[1]), 3)
     f[0] = str(round(float(f[0].split('*')[0]), 3)) + "*x"
     plt.title(title+";   "+"y = " + str(f[0]) + '+' +str(f[1]))
+    # plt.savefig("images/step_"+str(n)+".png")
     plt.show()
+    n += 1
 
 if __name__ == "__main__":
     plot("-x + 100", range(1, 101))

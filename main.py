@@ -10,9 +10,6 @@ diff = 12
 x_coors = np.array(sorted([float(randint(0, min(100, abs((100//slope)-intercept)))) for _ in range(size)]))
 y_coors = np.array([float(slope * x_coors[i] + randint(-diff, diff) + intercept) for i in range(size)])
 
-print(x_coors)
-print(y_coors)
-
 def neuralnet(unused):
     sess = tf.InteractiveSession()
     x = tf.placeholder("float", [size,], name="x")
@@ -27,10 +24,11 @@ def neuralnet(unused):
 
     feed = {x: x_coors, y: y_coors}
 
-    for i in range(1000):
+    for i in range(300):
         sess.run(train_step, feed_dict=feed)
-        if (i < 100 and (i+1) % 25 == 0) or (i+1) % 100 == 0:
-            error = sess.run(tf.reduce_sum(y-tf.scalar_mul(m, x)), feed_dict=feed)
+        if (i+1) % 20 == 0:
+            error = sess.run(tf.reduce_sum(tf.abs(y-(tf.scalar_mul(m, x) +
+                    tf.multiply(100., b)))), feed_dict=feed)
             slope, y_intercept = sess.run([m, b], feed_dict=feed)
             equation = str(slope) + "*x+" + str(abs(y_intercept*100))
             plot(equation, range(1, 101),x_coors, y_coors,
