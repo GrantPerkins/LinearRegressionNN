@@ -2,39 +2,39 @@ import tensorflow as tf
 import numpy as np
 from random import randint
 from graph import plot
-from  random import triangular
-size = 3
-x_coors = np.array([randint(0, 99) for _ in range(size)])
-y_coors = np.array([randint(0, 99) for _ in range(size)])
 
+size = 25
+slope = -.5
+intercept = 50
+diff = 12
+x_coors = np.array(sorted([float(randint(0, min(100, abs((100//slope)-intercept)))) for _ in range(size)]))
+y_coors = np.array([float(slope * x_coors[i] + randint(-diff, diff) + intercept) for i in range(size)])
+
+print(x_coors)
+print(y_coors)
 
 def neuralnet(unused):
     sess = tf.InteractiveSession()
     x = tf.placeholder("float", [size,], name="x")
     y = tf.placeholder("float", [size,], name="x")
-    m = tf.Variable(tf.zeros([1]), name="m")
-    b = tf.Variable(tf.zeros([1]), name="b")
-    y_intercept = tf.convert_to_tensor([b[0]]*size)
-    y_ = tf.scalar_mul(m[0], x) + tf.scalar_mul(100.0, y_intercept)
+    m = tf.Variable(0.0, name="m")
+    b = tf.Variable(0.0, name="b")
+    loss = tf.reduce_sum(tf.abs(y-(tf.scalar_mul(m, x)+ tf.multiply(100., b))))
 
-    cross_entropy = [0]
-    for i in range(size):
-        cross_entropy[0] += abs(y[i]-y_[i])
-    cross_entropy[0] /= size
-    cross_entropy = tf.convert_to_tensor(cross_entropy)
-    train_step = tf.train.GradientDescentOptimizer(0.00005).minimize(cross_entropy)
+    train_step = tf.train.GradientDescentOptimizer(0.00001).minimize(loss)
 
     tf.global_variables_initializer().run()
 
-    for i in range(10000):
-        sess.run(train_step, feed_dict={x: x_coors, y: y_coors})
-        if (i+1)%1000==0:
-            slope, y_intercept = sess.run([m, b], feed_dict={x:x_coors, y:y_coors})
-            op = '-' if y_intercept < 0 else '+'
-            plot(str(slope)+"*x"+op+str(abs(y_intercept*100)), range(1, 101), x_coors, y_coors)
+    feed = {x: x_coors, y: y_coors}
 
-    print(sess.run(cross_entropy, feed_dict={x: x_coors,
-                                        y: y_coors}))
+    for i in range(1000):
+        sess.run(train_step, feed_dict=feed)
+        if (i < 100 and (i+1) % 25 == 0) or (i+1) % 100 == 0:
+            error = sess.run(tf.reduce_sum(y-tf.scalar_mul(m, x)), feed_dict=feed)
+            slope, y_intercept = sess.run([m, b], feed_dict=feed)
+            equation = str(slope) + "*x+" + str(abs(y_intercept*100))
+            plot(equation, range(1, 101),x_coors, y_coors,
+                 "Round: " + str(i+1) + ";    Error: " + str(round(error, 2)))
 
 
 if __name__ == "__main__":
