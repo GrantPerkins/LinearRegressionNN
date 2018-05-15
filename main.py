@@ -1,12 +1,13 @@
 import tensorflow as tf
 import numpy as np
 from random import randint
-from graph import plot
+from graph import Plotter
 import argparse
 
 
 class Regressor:
     def __init__(self, size, slope, intercept, spread):
+        self.plotter = Plotter(size)
         self.size = size
         self.slope = slope
         self.intercept = intercept
