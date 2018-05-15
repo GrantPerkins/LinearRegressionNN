@@ -7,7 +7,7 @@ class Plotter:
         self.size = size
         self.n = n
 
-    def plot(self, formula, x_range, x_coors, y_coors, title):
+    def plot_line(self, formula, x_range, x_coors, y_coors, title):
         assert "x" in formula
         #assert all x values git on graph
         assert all([0 < x <= 100 for x in x_range])
@@ -27,6 +27,9 @@ class Plotter:
         # plt.savefig("images/step_"+str(self.n)+".png")
         plt.show()
         self.n += 1
+
+    def plot_parabola(self, formula, x_range, x_coors, y_coors, title):
+        pass
 
 if __name__ == "__main__":
     plotter = Plotter(25)

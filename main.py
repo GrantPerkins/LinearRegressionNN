@@ -5,17 +5,17 @@ from graph import Plotter
 import argparse
 
 
-class Regressor:
-    def __init__(self, size, slope, intercept, spread):
+class LinearRegressor:
+    """
+    Finds line of best fit with a linear scatter plot
+    """
+    def __init__(self, size, spread, slope, intercept):
         self.plotter = Plotter(size)
-        self.size = size
-        self.slope = slope
-        self.intercept = intercept
         self.spread = spread
         self.x_coors = np.array(sorted([float(randint(0,
-                        min(100, abs((100 // slope) - intercept)))) for _ in range(size)]))
+                                min(100, abs((100 // slope) - intercept)))) for _ in range(size)]))
         self.y_coors = np.array([float(slope *
-                        self.x_coors[i] + randint(-spread, spread) + intercept) for i in range(size)])
+                                self.x_coors[i] + randint(-spread, spread) + intercept) for i in range(size)])
 
 
     def train(self, unused):
@@ -39,8 +39,20 @@ class Regressor:
                         tf.multiply(100., b)))), feed_dict=feed)
                 slope, y_intercept = sess.run([m, b], feed_dict=feed)
                 equation = str(slope) + "*x+" + str(abs(y_intercept*100))
-                plot(equation, range(1, 101), self.x_coors, self.y_coors,
-                     "Round: " + str(i+1) + ";    Error: " + str(round(error, 2)))
+                self.plotter.plot_line(equation, range(1, 101), self.x_coors, self.y_coors,
+                                       "Round: " + str(i+1) + ";    Error: " + str(round(error, 2)))
+
+
+class ParabolicRegressor:
+    """
+    Finds line of best fit with a parabolic scatter plot
+    """
+    def __init__(self, size, spread, a, b, c):
+        self.plotter = Plotter(size)
+        self.x_coors = np.array(sorted([float(randint(0, 100)) for _ in range(size)]))
+        self.y_coors = np.array([a*(self.x_coors[i])**2 + b*self.x_coors[i] + c +
+                                randint(-spread, spread)for i in range(size)])
+
 
 
 if __name__ == "__main__":
@@ -56,5 +68,5 @@ if __name__ == "__main__":
     intercept = 50. if args["intercept"] is None else float(args["intercept"])
     spread = 12 if args["spread"] is None else int(args["spread"])
     print(size, slope, intercept, spread)
-    regressor = Regressor(size, slope, intercept, spread)
+    regressor = LinearRegressor(size, spread, slope, intercept)
     tf.app.run(main=regressor.train)
